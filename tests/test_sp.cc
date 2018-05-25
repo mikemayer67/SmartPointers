@@ -1,5 +1,5 @@
 #include <iostream>
-#include "SharePointer.h"
+#include "SmartPointers.h"
 #include "test_common.h"
 
 using namespace std;
@@ -21,11 +21,11 @@ void raw_tests(void)
 
 void const_shr_tests(void)
 {
-  cout << endl << "======> SharePtr::const_shr<T> tests <=======" << endl;
-  TEST( SharePtr::const_shr<A> a1 = new A);
-  TEST( SharePtr::const_shr<A> a2 = new B);
-  TEST( SharePtr::const_shr<B> b1 = new B);
-  TEST( SharePtr::const_shr<B> b2);
+  cout << endl << "======> SmartPointer::const_shr<T> tests <=======" << endl;
+  TEST( SmartPointer::const_shr<A> a1 = new A);
+  TEST( SmartPointer::const_shr<A> a2 = new B);
+  TEST( SmartPointer::const_shr<B> b1 = new B);
+  TEST( SmartPointer::const_shr<B> b2);
 
   try
   {
@@ -56,11 +56,11 @@ void const_shr_tests(void)
 
 void shr_tests(void)
 {
-  cout << endl << "======> SharePtr::shr<T> tests <=======" << endl;
-  TEST( SharePtr::shr<A> a1 = new A);
-  TEST( SharePtr::shr<A> a2 = new B);
-  TEST( SharePtr::shr<B> b1 = new B);
-  TEST( SharePtr::shr<B> b2);
+  cout << endl << "======> SmartPointer::shr<T> tests <=======" << endl;
+  TEST( SmartPointer::shr<A> a1 = new A);
+  TEST( SmartPointer::shr<A> a2 = new B);
+  TEST( SmartPointer::shr<B> b1 = new B);
+  TEST( SmartPointer::shr<B> b2);
 
   try
   {
@@ -90,16 +90,16 @@ void shr_tests(void)
 
 void cross_tests(void)
 {
-  cout << endl << "======> SharePtr::shr<T> / SharePtr::const_shr<T> tests <=======" << endl;
+  cout << endl << "======> SmartPointer::shr<T> / SmartPointer::const_shr<T> tests <=======" << endl;
 
-  TEST(SharePtr::const_shr<A> ca1 = new A);
-  TEST(SharePtr::const_shr<A> ca2 = ca1);
+  TEST(SmartPointer::const_shr<A> ca1 = new A);
+  TEST(SmartPointer::const_shr<A> ca2 = ca1);
 
-  TEST(SharePtr::shr<A> a1 = new A);
-  TEST(SharePtr::shr<A> a2 = a1);
+  TEST(SmartPointer::shr<A> a1 = new A);
+  TEST(SmartPointer::shr<A> a2 = a1);
 
-//  TEST(SharePtr::shr<A> a3 = ca1);  // will rightfully fail compilation if uncommented
-  TEST(SharePtr::const_shr<A> ca3 = a1);
+//  TEST(SmartPointer::shr<A> a3 = ca1);  // will rightfully fail compilation if uncommented
+  TEST(SmartPointer::const_shr<A> ca3 = a1);
 
   TEST(a1->const_func());
   TEST(a1->func());

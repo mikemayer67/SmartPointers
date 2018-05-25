@@ -6,11 +6,11 @@
 //    templates defined in this header file.  There is no source file.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef SMARTPOINTERS_NAMESPACE
-#if SMARTPOINTERS_NAMESPACE==1
+#ifdef SMARTPOINTER_NAMESPACE
+#if SMARTPOINTER_NAMESPACE==1
 #define NS SmartPointer
 #else
-#define NS SMARTPOINTERS_NAMESPACE
+#define NS SMARTPOINTER_NAMESPACE
 #endif
 #endif
 
@@ -61,6 +61,9 @@ namespace NS {
       typedef const_own<T>  Type_t;
       typedef smrt<T>       Parent_t;
 
+      using Parent_t::_ptr;
+      using Parent_t::assert_set;
+
       // Constructors and Assignment
 
       public: const_own(const T *p=NULL) : Parent_t(p) {}
@@ -74,7 +77,7 @@ namespace NS {
 
       public: ~const_own() { if(_ptr != NULL) delete _ptr; }
 
-      public: void delete(void) { if(_ptr != NULL) delete _ptr; _ptr = NULL; }
+      public: void release(void) { if(_ptr != NULL) delete _ptr; _ptr = NULL; }
     };
 
   template <typename T>
@@ -82,10 +85,14 @@ namespace NS {
     {
       typedef       own<T> Type_t;
       typedef const_own<T> Parent_t;
+      typedef      smrt<T> Base_t;
+
+      using Base_t::_ptr;
+      using Base_t::assert_set;
 
       // Constructors and Assignment
 
-      public: shr(T *p=NULL) : Parent_t(p) {}
+      public: own(T *p=NULL) : Parent_t(p) {}
 
       public: Type_t &operator=(T* p) { Parent_t::operator=(p); return *this; }
 
@@ -104,10 +111,13 @@ namespace NS {
 
 
   template <typename T>
-    class const_shr
+    class const_shr : public smrt<T>
     {
       typedef const_shr<T>  Type_t;
       typedef smrt<T>       Parent_t;
+
+      using Parent_t::_ptr;
+      using Parent_t::assert_set;
 
       // Constructors and Assignment
 
@@ -127,30 +137,30 @@ namespace NS {
 
       // Internal Methods
 
-      private: void set(const T* p)
-               {
-                 decr();
-                 _ptr = p;
-                 if(p!=NULL) { _refCount = new unsigned long; *_refCount = 1; }
-                 else        { _refCount = NULL;                              }
-               }
-
-      private: void set(const const_shr<T> &p)
-               {
-                 decr();
-                 _ptr = p._ptr;
-                 if( p.isSet() ) { _refCount = p._refCount; *_refCount += 1; }
-                 else            { _refCount = NULL;                         }
-               }
-
-      private: void decr(void)
-               {
-                 if( _refCount != NULL )
+      protected: void set(const T* p)
                  {
-                   *_refCount -= 1;
-                   if(*_refCount==0) { delete _ptr; delete _refCount; _ptr = NULL; _refCount = NULL; }
+                   decr();
+                   _ptr = p;
+                   if(p!=NULL) { _refCount = new unsigned long; *_refCount = 1; }
+                   else        { _refCount = NULL;                              }
                  }
-               }
+
+      protected: void set(const const_shr<T> &p)
+                 {
+                   decr();
+                   _ptr = p._ptr;
+                   if( p.isSet() ) { _refCount = p._refCount; *_refCount += 1; }
+                   else            { _refCount = NULL;                         }
+                 }
+
+      protected: void decr(void)
+                 {
+                   if( _refCount != NULL )
+                   {
+                     *_refCount -= 1;
+                     if(*_refCount==0) { delete _ptr; delete _refCount; _ptr = NULL; _refCount = NULL; }
+                   }
+                 }
 
       // Attributes
 
@@ -162,6 +172,10 @@ namespace NS {
     {
       typedef       shr<T> Type_t;
       typedef const_shr<T> Parent_t;
+      typedef      smrt<T> Base_t;
+
+      using Base_t::_ptr;
+      using Base_t::assert_set;
 
       // Constructors and Assignment
 
@@ -185,6 +199,9 @@ namespace NS {
       typedef const_ref<T>  Type_t;
       typedef smrt<T>       Parent_t;
 
+      using Parent_t::_ptr;
+      using Parent_t::assert_set;
+
       // Constructors and Assignement
 
       public: const_ref(const Parent_t &p) : Parent_t(p) {}
@@ -199,6 +216,10 @@ namespace NS {
     {
       typedef       ref<T> Type_t;
       typedef const_ref<T> Parent_t;
+      typedef      smrt<T> Base_t;
+
+      using Base_t::_ptr;
+      using Base_t::assert_set;
 
       // Constructors and Assignment
 

@@ -184,7 +184,7 @@ Pubic Methods:
        
   own<T> only:
 
-      void delete();           // sets pointer to NULL, deallocating current pointer.
+      void release();           // sets pointer to NULL, deallocating current pointer.
        
   shr<T> only:
 

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "SharePointer.h"
+#include "SmartPointers.h"
 #include "test_common.h"
 
 using namespace std;

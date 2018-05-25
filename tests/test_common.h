@@ -68,5 +68,6 @@ class B : public A
 };
 
 std::ostream &operator<<(std::ostream &s, const A &x) { x.write(s); return s; }
+std::ostream &operator<<(std::ostream &s, const B &x) { x.write(s); return s; }
 
 #define TEST(x) std::cout << std::endl << "test> " #x << std::endl; x
