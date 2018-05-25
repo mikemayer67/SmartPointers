@@ -1,0 +1,107 @@
+
+See the README.txt file for use of smart pointer templates in your code.  The 
+  simplest names of these templates are:
+    smrt<T> const_smrt<T>
+    own<T>  const_own<T>
+    shr<T>  const_shr<T>
+    ref<T>  const_ref<T>
+
+It is recognized, however, that the simplicity of these class names could result
+  in naming conflicts in the global namespace.  To rememedy this, you can add a 
+  namespace (of your choosing) to encapsulate these templates.
+  
+  You can pick this namespace by assigning SMARTPOINTER_NAMESPACE the desired name.
+  If you do not set a value when defining SMARTPOINTER_NAMESPACE, it will use the
+    SmartPointer namespace.
+
+Example 1: Defining your own namespace (cc)
+
+  g++ -DSMARTPIONTER_NAMESPACE=sp *.cc
+
+  puts templates into the cc namespace
+
+    shr<T>               // INVALID
+    const_shr<T>         // INVALID
+    sp::shr<T>           // OK
+    sp::const_shr<T>     // OK
+
+  or 
+
+    using namespace sp;
+
+    shr<T>               // OK
+    const_shr<T>         // OK
+    sp::shr<T>           // OK
+    sp::const_shr<T>     // OK
+
+  or
+
+    using sp::const_shr;
+
+    shr<T>               // INVALID
+    const_shr<T>         // OK
+    sp::shr<T>           // OK
+    sp::const_shr<T>     // OK
+
+
+Example 2: Requiring a namespace without specifiying its name
+
+  g++ -DSMARTPIONTER_NAMESPACE *.cc
+
+  puts templates into the SmartPointer namespace
+
+    shr<T>                     // INVALID
+    const_shr<T>               // INVALID
+    SmartPointer::shr<T>       // OK
+    SmartPointer::const_shr<T> // OK
+
+  or 
+
+    using namespace SharePtr;
+
+    shr<T>                     // OK
+    const_shr<T>               // OK
+    SmartPointer::shr<T>       // OK
+    SmartPointer::const_shr<T> // OK
+
+  or
+
+    using SharePtr::const_shr;
+
+    shr<T>                     // INVALID
+    const_shr<T>               // OK
+    SmartPointer::shr<T>       // OK
+    SmartPointer::const_shr<T> // OK
+
+
+Example 3: Using the global namespace
+
+  g++ *.cc
+
+  puts templates into the global namespace
+
+    shr<T>             // OK
+    const_shr<T>       // OK
+    ::shr<T>           // OK
+    ::const_shr<T>     // OK
+
+  or 
+
+    using namespace ;
+
+    shr<T>             // OK
+    const_shr<T>       // OK
+    ::shr<T>           // OK
+    ::const_shr<T>     // OK
+
+  or
+
+    using ::const_shr;
+
+    shr<T>             // OK
+    const_shr<T>       // OK
+    ::shr<T>           // OK
+    ::const_shr<T>     // OK
+
+    
+
