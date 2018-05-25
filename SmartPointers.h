@@ -26,7 +26,7 @@ namespace NS {
       // Constructors and Assignment
 
       protected: smrt(const T *p=NULL) : _ptr(p)      {}
-      protected: smrt(const Type_t &p) : _ptr(p.ptr_) {}
+      protected: smrt(const Type_t &p) : _ptr(p._ptr) {}
 
       protected: Type_t &operator=(const T*  p)     { _ptr = p;      return *this; }
       protected: Type_t &operator=(const Type_t &p) { _ptr = p._ptr; return *this; }
