@@ -2,11 +2,9 @@
 #include "SmartPointers.h"
 #include "test_common.h"
 
-using namespace std;
-
 void raw_tests(void)
 {
-  cout << endl << "======> raw pointer tests <=======" << endl;
+  std::cout << std::endl << "======> raw pointer tests <=======" << std::endl;
   TEST(A *a1 = new A);
   TEST(A *a2 = new B);
   TEST(B *b1 = new B);
@@ -16,12 +14,12 @@ void raw_tests(void)
   TEST(delete a2);
   TEST(delete b1);
 
-  cout << endl << "--DONE--" << endl;
+  std::cout << std::endl << "--DONE--" << std::endl;
 }
 
 void const_own_tests(void)
 {
-  cout << endl << "======> const_own<T> tests <=======" << endl;
+  std::cout << std::endl << "======> const_own<T> tests <=======" << std::endl;
   TEST( const_own<A> a1 = new A);
   TEST( const_own<A> a2 = new B);
   TEST( const_own<B> b1 = new B);
@@ -29,34 +27,35 @@ void const_own_tests(void)
 
   try
   {
-    TEST(cout << *a1 << endl);
-    TEST(cout << *a2 << endl);
-    TEST(cout << *b1 << endl);
-    TEST(cout << *b2 << endl);
+    TEST(std::cout << *a1 << std::endl);
+    TEST(std::cout << *a2 << std::endl);
+    TEST(std::cout << *b1 << std::endl);
+    TEST(std::cout << *b2 << std::endl);
   }
   catch(std::runtime_error e)
   {
-    cout << ">>> runtime error caught: " << e.what() << " <<< " << endl;
+    std::cout << ">>> runtime error caught: " << e.what() << " <<< " << std::endl;
   }
-  TEST(b2=b1);
-  TEST(cout << *b2 << endl);
+
+  TEST(b2 = new B);
+  TEST(std::cout << *b2 << std::endl);
+  TEST(b2 = new B);
+  TEST(std::cout << *b2 << std::endl);
 
   TEST(const A *ap = a1.raw());
-  TEST(cout << *ap << endl);
-  TEST(a1=a2);
-  TEST(cout << *a1 << std::endl);
+  TEST(std::cout << *ap << std::endl);
 
-//  TEST(a1->func());  // will rightfully fail compilation if uncommented
-//  TEST(b1->func());  // will rightfully fail compilation if uncommented
   TEST(a1->const_func());
   TEST(b1->const_func());
 
-  cout << endl << "--DONE--" << endl;
+  TEST(b1.release());
+
+  std::cout << std::endl << "--DONE--" << std::endl;
 }
 
 void own_tests(void)
 {
-  cout << endl << "======> own<T> tests <=======" << endl;
+  std::cout << std::endl << "======> own<T> tests <=======" << std::endl;
   TEST( own<A> a1 = new A);
   TEST( own<A> a2 = new B);
   TEST( own<B> b1 = new B);
@@ -64,33 +63,36 @@ void own_tests(void)
 
   try
   {
-    TEST(cout << *a1 << endl);
-    TEST(cout << *a2 << endl);
-    TEST(cout << *b1 << endl);
-    TEST(cout << *b2 << endl);
+    TEST(std::cout << *a1 << std::endl);
+    TEST(std::cout << *a2 << std::endl);
+    TEST(std::cout << *b1 << std::endl);
+    TEST(std::cout << *b2 << std::endl);
   }
   catch(std::runtime_error e)
   {
-    cout << ">>> runtime error caught: " << e.what() << " <<< " << endl;
+    std::cout << ">>> runtime error caught: " << e.what() << " <<< " << std::endl;
   }
-  TEST(b2=b1);
-  TEST(cout << *b2 << endl);
+  TEST(b2 = new B);
+  TEST(std::cout << *b2 << std::endl);
+  TEST(b2 = new B);
+  TEST(std::cout << *b2 << std::endl);
 
   TEST(const A *ap = a1.raw());
-  TEST(cout << *ap << endl);
-  TEST(a1=a2);
-  TEST(cout << *a1 << std::endl);
+  TEST(std::cout << *ap << std::endl);
 
   TEST(a1->func());
   TEST(a1->const_func());
   TEST(b1->func());
   TEST(b1->const_func());
-  cout << endl << "--DONE--" << endl;
+
+  TEST(b1.release());
+
+  std::cout << std::endl << "--DONE--" << std::endl;
 }
 
 void const_shr_tests(void)
 {
-  cout << endl << "======> const_shr<T> tests <=======" << endl;
+  std::cout << std::endl << "======> const_shr<T> tests <=======" << std::endl;
   TEST( const_shr<A> a1 = new A);
   TEST( const_shr<A> a2 = new B);
   TEST( const_shr<B> b1 = new B);
@@ -98,34 +100,37 @@ void const_shr_tests(void)
 
   try
   {
-    TEST(cout << *a1 << endl);
-    TEST(cout << *a2 << endl);
-    TEST(cout << *b1 << endl);
-    TEST(cout << *b2 << endl);
+    TEST(std::cout << *a1 << std::endl);
+    TEST(std::cout << *a2 << std::endl);
+    TEST(std::cout << *b1 << std::endl);
+    TEST(std::cout << *b2 << std::endl);
   }
   catch(std::runtime_error e)
   {
-    cout << ">>> runtime error caught: " << e.what() << " <<< " << endl;
+    std::cout << ">>> runtime error caught: " << e.what() << " <<< " << std::endl;
   }
   TEST(b2=b1);
-  TEST(cout << *b2 << endl);
+  TEST(std::cout << *b2 << std::endl);
 
   TEST(const A *ap = a1.raw());
-  TEST(cout << *ap << endl);
+  TEST(std::cout << *ap << std::endl);
   TEST(a1=a2);
-  TEST(cout << *a1 << "  refCount=" << a1.refCount() << std::endl);
+  SHOW_SHR(a1);
 
 //  TEST(a1->func());  // will rightfully fail compilation if uncommented
 //  TEST(b1->func());  // will rightfully fail compilation if uncommented
   TEST(a1->const_func());
   TEST(b1->const_func());
 
-  cout << endl << "--DONE--" << endl;
+  TEST(a2.release());
+  SHOW_SHR(a1);
+
+  std::cout << std::endl << "--DONE--" << std::endl;
 }
 
 void shr_tests(void)
 {
-  cout << endl << "======> shr<T> tests <=======" << endl;
+  std::cout << std::endl << "======> shr<T> tests <=======" << std::endl;
   TEST( shr<A> a1 = new A);
   TEST( shr<A> a2 = new B);
   TEST( shr<B> b1 = new B);
@@ -133,33 +138,38 @@ void shr_tests(void)
 
   try
   {
-    TEST(cout << *a1 << endl);
-    TEST(cout << *a2 << endl);
-    TEST(cout << *b1 << endl);
-    TEST(cout << *b2 << endl);
+    TEST(std::cout << *a1 << std::endl);
+    TEST(std::cout << *a2 << std::endl);
+    TEST(std::cout << *b1 << std::endl);
+    TEST(std::cout << *b2 << std::endl);
   }
   catch(std::runtime_error e)
   {
-    cout << ">>> runtime error caught: " << e.what() << " <<< " << endl;
+    std::cout << ">>> runtime error caught: " << e.what() << " <<< " << std::endl;
   }
   TEST(b2=b1);
-  TEST(cout << *b2 << endl);
+  TEST(std::cout << *b2 << std::endl);
 
   TEST(const A *ap = a1.raw());
-  TEST(cout << *ap << endl);
+  TEST(std::cout << *ap << std::endl);
   TEST(a1=a2);
-  TEST(cout << *a1 << "  refCount=" << a1.refCount() << std::endl);
+  SHOW_SHR(a1);
 
   TEST(a1->func());
   TEST(a1->const_func());
   TEST(b1->func());
   TEST(b1->const_func());
-  cout << endl << "--DONE--" << endl;
+
+  TEST(a2.release());
+  SHOW_SHR(a1);
+  SHOW_SHR(a2);
+
+  std::cout << std::endl << "--DONE--" << std::endl;
 }
 
 void cross_tests(void)
 {
-  cout << endl << "======> shr<T> / const_shr<T> tests <=======" << endl;
+  std::cout << std::endl << "======> shr<T> / const_shr<T> tests <=======" << std::endl;
 
   TEST(const_shr<A> ca1 = new A);
   TEST(const_shr<A> ca2 = ca1);
@@ -175,8 +185,8 @@ void cross_tests(void)
   TEST(ca3->const_func());
 //  TEST(ca3->func());  // will rightfully fail compilation if uncommented (even though same pointer as a1)
 
-  TEST( if(a1==ca1) cout << "  OK"; else cout << "NOPE"; cout << ":  " << *a1 << " vs " << *ca1 << endl); 
-  TEST( if(a1==ca3) cout << "  OK"; else cout << "NOPE"; cout << ":  " << *a1 << " vs " << *ca3 << endl);
+  TEST( if(a1==ca1) std::cout << "  OK"; else std::cout << "NOPE"; std::cout << ":  " << *a1 << " vs " << *ca1 << std::endl); 
+  TEST( if(a1==ca3) std::cout << "  OK"; else std::cout << "NOPE"; std::cout << ":  " << *a1 << " vs " << *ca3 << std::endl);
 
   TEST( A* ra1 = a1.raw() );
 //  TEST( A* ra2 = ca1.raw() );  // will rightfully fail compilation if uncommented  
@@ -188,7 +198,122 @@ void cross_tests(void)
   TEST(ca2=a1);
   TEST(ca3=a1);
 
-  cout << endl << "--DONE--" << endl;
+  std::cout << std::endl << "--DONE--" << std::endl;
+}
+
+void const_ref_tests(void)
+{
+  std::cout << std::endl << "======> const_ref<T> tests <=======" << std::endl;
+  TEST( const_own<A> oa1 = new A);
+  TEST(       own<A> oa2 = new A);
+  TEST( const_own<B> ob1 = new B);
+  TEST( const_shr<A> sa1 = new A);
+  TEST( const_shr<A> sa2 = sa1  );
+  TEST(       shr<A> sa3 = new A);
+  TEST( const_shr<B> sb1 = new B);
+  TEST( const_ref<A>  a1 = oa1  );
+  TEST( const_ref<A>  a2 = sa1  );
+  TEST( const_ref<A>  a3 = sa2  );
+  TEST( const_ref<A>  a4 = oa2  );
+  TEST( const_ref<A>  a5 = sa3  );
+  TEST( const_ref<B>  b1 = ob1  );
+  TEST( const_ref<B>  b2 = sb1  );
+
+  try
+  {
+    TEST(std::cout << *a1 << std::endl);
+    TEST(std::cout << *a2 << std::endl);
+    TEST(std::cout << *a3 << std::endl);
+    TEST(std::cout << *a4 << std::endl);
+    TEST(std::cout << *a5 << std::endl);
+    TEST(std::cout << *b1 << std::endl);
+    TEST(std::cout << *b2 << std::endl);
+  }
+  catch(std::runtime_error e)
+  {
+    std::cout << ">>> runtime error caught: " << e.what() << " <<< " << std::endl;
+  }
+
+  TEST(const A *ap = a1.raw());
+  TEST(std::cout << *ap << std::endl);
+
+  TEST(a1->const_func());
+  TEST(b1->const_func());
+
+  try
+  {
+    SHOW_SHR(sa1);
+    SHOW_SHR(sa2);
+    TEST(sa1.release());
+    SHOW_SHR(sa1);
+    SHOW_SHR(sa2);
+    TEST(sa2.release());
+    SHOW_SHR(sa1);
+    SHOW_SHR(sa2);
+    TEST(std::cout << *a2 << std::endl);
+  }
+  catch(std::runtime_error e)
+  {
+    std::cout << ">>> runtime error caught: " << e.what() << " <<< " << std::endl;
+  }
+
+  std::cout << std::endl << "--DONE--" << std::endl;
+}
+
+void ref_tests(void)
+{
+  std::cout << std::endl << "======> ref<T> tests <=======" << std::endl;
+  TEST( own<A> oa1 = new A);
+  TEST( own<B> ob1 = new B);
+  TEST( shr<A> sa1 = new A);
+  TEST( shr<A> sa2 = sa1);
+  TEST( shr<B> sb1 = new B);
+  TEST( ref<A>  a1 = oa1 );
+  TEST( ref<A>  a2 = sa1 );
+  TEST( ref<A>  a3 = sa2 );
+  TEST( ref<B>  b1 = ob1 );
+  TEST( ref<B>  b2 = sb1 );
+
+  try
+  {
+    TEST(std::cout << *a1 << std::endl);
+    TEST(std::cout << *a2 << std::endl);
+    TEST(std::cout << *a3 << std::endl);
+    TEST(std::cout << *b1 << std::endl);
+    TEST(std::cout << *b2 << std::endl);
+  }
+  catch(std::runtime_error e)
+  {
+    std::cout << ">>> runtime error caught: " << e.what() << " <<< " << std::endl;
+  }
+
+  TEST(A *ap = a1.raw());
+  TEST(std::cout << *ap << std::endl);
+
+  TEST(a1->const_func());
+  TEST(b1->const_func());
+
+  TEST(a1->func());
+  TEST(b1->func());
+
+  try
+  {
+    SHOW_SHR(sa1);
+    SHOW_SHR(sa2);
+    TEST(sa1.release());
+    SHOW_SHR(sa1);
+    SHOW_SHR(sa2);
+    TEST(sa2.release());
+    SHOW_SHR(sa1);
+    SHOW_SHR(sa2);
+    TEST(std::cout << *a2 << std::endl);
+  }
+  catch(std::runtime_error e)
+  {
+    std::cout << ">>> runtime error caught: " << e.what() << " <<< " << std::endl;
+  }
+
+  std::cout << std::endl << "--DONE--" << std::endl;
 }
 
 int main(int argc,const char **argv)
@@ -199,6 +324,8 @@ int main(int argc,const char **argv)
   const_shr_tests();
   shr_tests();
   cross_tests();
+  const_ref_tests();
+  ref_tests();
 
   return 0;      
 }

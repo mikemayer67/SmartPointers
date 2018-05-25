@@ -24,18 +24,15 @@ namespace NS {
       typedef smrt<T> Type_t;
 
       // Constructors and Assignment
+      //   True construction must occur in the subclasses
 
-      protected: smrt(const T *p=NULL) : _ptr(p)      {}
-      protected: smrt(const Type_t &p) : _ptr(p._ptr) {}
-
-      protected: Type_t &operator=(const T*  p)     { _ptr = p;      return *this; }
-      protected: Type_t &operator=(const Type_t &p) { _ptr = p._ptr; return *this; }
+      protected: smrt(void) : _ptr(NULL) {}
 
       // Methods
 
-      public: const T &operator*(void)  const { assert_set(); return *_ptr; }
-      public: const T *operator->(void) const { assert_set(); return  _ptr; }
-      public: const T *raw(void)        const {               return  _ptr; }
+      public: const T &operator*(void)  const { validate(); return *_ptr; }
+      public: const T *operator->(void) const { validate(); return  _ptr; }
+      public: const T *raw(void)        const {             return  _ptr; }
 
       public: bool isSet(void)     const { return _ptr!=NULL; }
       public: bool isNull(void)    const { return _ptr==NULL; }
@@ -44,7 +41,7 @@ namespace NS {
       public: bool operator == (const Type_t &p) const { return _ptr == p._ptr; }
       public: bool operator <  (const Type_t &p) const { return _ptr <  p._ptr; }
 
-      protected: void assert_set(void) const
+      protected: void validate(void) const
                  {
                    if(_ptr==NULL) 
                      throw std::runtime_error("Attempting to dereference NULL smart pointer");
@@ -61,23 +58,22 @@ namespace NS {
       typedef const_own<T>  Type_t;
       typedef smrt<T>       Parent_t;
 
-      using Parent_t::_ptr;
-      using Parent_t::assert_set;
-
       // Constructors and Assignment
 
-      public: const_own(const T *p=NULL) : Parent_t(p) {}
+      public:  const_own(const T *p=NULL) { this->_ptr = p; }
 
       public: Type_t &operator=(const T* p) 
               { 
-                if(_ptr != p && _ptr != NULL) delete _ptr;
-                _ptr = p;
+                if(this->_ptr != p && this->_ptr != NULL) delete this->_ptr;
+                this->_ptr = p;
                 return *this;
               }
 
-      public: ~const_own() { if(_ptr != NULL) delete _ptr; }
+      private: Type_t &operator=(const Type_t  &p);
 
-      public: void release(void) { if(_ptr != NULL) delete _ptr; _ptr = NULL; }
+      public: ~const_own() { if(this->_ptr != NULL) delete this->_ptr; }
+
+      public: void release(void) { if(this->_ptr != NULL) delete this->_ptr; this->_ptr = NULL; }
     };
 
   template <typename T>
@@ -87,14 +83,14 @@ namespace NS {
       typedef const_own<T> Parent_t;
       typedef      smrt<T> Base_t;
 
-      using Base_t::_ptr;
-      using Base_t::assert_set;
+      using Base_t::validate;
 
       // Constructors and Assignment
 
-      public: own(T *p=NULL) : Parent_t(p) {}
+      public:  own(T *p=NULL) : Parent_t(p) {}
 
-      public: Type_t &operator=(T* p) { Parent_t::operator=(p); return *this; }
+      public:  Type_t &operator=(T* p) { Parent_t::operator=(p); return *this; }
+      private: Type_t &operator=(const Type_t  &p);
 
       // Methods
       //------------------------------------------------------------
@@ -104,9 +100,9 @@ namespace NS {
       //   only reason that _ptr is a const T* is that it is inherited from
       //   the parent smrt<T> class, which requires it to be a const T*
       //------------------------------------------------------------
-      public:    T &operator*(void)  const { assert_set(); return *const_cast<T*>(this->_ptr); }
-      public:    T *operator->(void) const { assert_set(); return  const_cast<T*>(this->_ptr); }
-      public:    T *raw(void)        const {               return  const_cast<T*>(this->_ptr); }
+      public:    T &operator*(void)  const { validate(); return *const_cast<T*>(this->_ptr); }
+      public:    T *operator->(void) const { validate(); return  const_cast<T*>(this->_ptr); }
+      public:    T *raw(void)        const {             return  const_cast<T*>(this->_ptr); }
     };
 
 
@@ -116,13 +112,10 @@ namespace NS {
       typedef const_shr<T>  Type_t;
       typedef smrt<T>       Parent_t;
 
-      using Parent_t::_ptr;
-      using Parent_t::assert_set;
-
       // Constructors and Assignment
 
-      public: const_shr(const T *p=NULL) : Parent_t(NULL), _refCount(NULL) { set(p); }
-      public: const_shr(const Type_t &p) : Parent_t(NULL), _refCount(NULL) { set(p); }
+      public: const_shr(const T *p=NULL) : _refCount(NULL) { set(p); }
+      public: const_shr(const Type_t &p) : _refCount(NULL) { set(p); }
 
       public: ~const_shr() { decr(); }
 
@@ -133,14 +126,14 @@ namespace NS {
 
       // Public Methods
 
-      public: unsigned long refCount(void) const { return ( _refCount==NULL ? 0UL : *_refCount ); }
+      public: unsigned long refCount(void) const { return ( _refCount ? *_refCount : 0UL ); }
 
       // Internal Methods
 
       protected: void set(const T* p)
                  {
                    decr();
-                   _ptr = p;
+                   this->_ptr = p;
                    if(p!=NULL) { _refCount = new unsigned long; *_refCount = 1; }
                    else        { _refCount = NULL;                              }
                  }
@@ -148,7 +141,7 @@ namespace NS {
       protected: void set(const const_shr<T> &p)
                  {
                    decr();
-                   _ptr = p._ptr;
+                   this->_ptr = p._ptr;
                    if( p.isSet() ) { _refCount = p._refCount; *_refCount += 1; }
                    else            { _refCount = NULL;                         }
                  }
@@ -158,7 +151,7 @@ namespace NS {
                    if( _refCount != NULL )
                    {
                      *_refCount -= 1;
-                     if(*_refCount==0) { delete _ptr; delete _refCount; _ptr = NULL; _refCount = NULL; }
+                     if(*_refCount==0) { delete this->_ptr; delete _refCount; this->_ptr = NULL; _refCount = NULL; }
                    }
                  }
 
@@ -175,7 +168,7 @@ namespace NS {
       typedef      smrt<T> Base_t;
 
       using Base_t::_ptr;
-      using Base_t::assert_set;
+      using Base_t::validate;
 
       // Constructors and Assignment
 
@@ -187,9 +180,9 @@ namespace NS {
 
       // Methods (see notes above in own<T> class)
 
-      public: T &operator*(void)  const { assert_set(); return *const_cast<T*>(this->_ptr); }
-      public: T *operator->(void) const { assert_set(); return  const_cast<T*>(this->_ptr); }
-      public: T *raw(void)        const {               return  const_cast<T*>(this->_ptr); }
+      public: T &operator*(void)  const { validate(); return *const_cast<T*>(this->_ptr); }
+      public: T *operator->(void) const { validate(); return  const_cast<T*>(this->_ptr); }
+      public: T *raw(void)        const {             return  const_cast<T*>(this->_ptr); }
     };
 
 
@@ -199,16 +192,18 @@ namespace NS {
       typedef const_ref<T>  Type_t;
       typedef smrt<T>       Parent_t;
 
-      using Parent_t::_ptr;
-      using Parent_t::assert_set;
-
       // Constructors and Assignement
 
-      public: const_ref(const Parent_t &p) : Parent_t(p) {}
+      public: const_ref(void) {}
+      public: const_ref(const Parent_t &p) { this->_ptr = p.raw(); }
 
-      public: Type_t &operator=( const Parent_t &p ) { Parent_t::operator=(p); return *this; }
+      public: Type_t &operator=( const Parent_t &p ) 
+              { 
+                this->_ptr = p.raw(); 
+                return *this; 
+              }
 
-      public: void clear(void) { _ptr = NULL; }
+      public: void clear(void) { this->_ptr = NULL; }
     };
 
   template <typename T>
@@ -218,24 +213,24 @@ namespace NS {
       typedef const_ref<T> Parent_t;
       typedef      smrt<T> Base_t;
 
-      using Base_t::_ptr;
-      using Base_t::assert_set;
+      using Base_t::validate;
 
       // Constructors and Assignment
 
-      public: ref(const own<T> &p)  : Parent_t(p) {}
-      public: ref(const shr<T> &p)  : Parent_t(p) {}
-      public: ref(const ref<T> &p)  : Parent_t(p) {}
+      public: ref(void) {}
+      public: ref(const own<T> &p) : Parent_t(p) {}
+      public: ref(const shr<T> &p) : Parent_t(p) {}
+      public: ref(const ref<T> &p) : Parent_t(p) {}
 
-      public: Type_t &operator=(const own<T> &p) { Parent_t::set(p); return *this; }
-      public: Type_t &operator=(const shr<T> &p) { Parent_t::set(p); return *this; }
-      public: Type_t &operator=(const ref<T> &p) { Parent_t::set(p); return *this; }
+      public: Type_t &operator=(const own<T> &p) { Parent_t::operator=(p); return *this; }
+      public: Type_t &operator=(const shr<T> &p) { Parent_t::operator=(p); return *this; }
+      public: Type_t &operator=(const ref<T> &p) { Parent_t::operator=(p); return *this; }
 
       // Methods (see notes above in own<T> class)
 
-      public: T &operator*(void)  const { assert_set(); return *const_cast<T*>(this->_ptr); }
-      public: T *operator->(void) const { assert_set(); return  const_cast<T*>(this->_ptr); }
-      public: T *raw(void)        const {               return  const_cast<T*>(this->_ptr); }
+      public: T &operator*(void)  const { validate(); return *const_cast<T*>(this->_ptr); }
+      public: T *operator->(void) const { validate(); return  const_cast<T*>(this->_ptr); }
+      public: T *raw(void)        const {             return  const_cast<T*>(this->_ptr); }
     };
 
 #ifdef NS

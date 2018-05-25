@@ -71,3 +71,9 @@ std::ostream &operator<<(std::ostream &s, const A &x) { x.write(s); return s; }
 std::ostream &operator<<(std::ostream &s, const B &x) { x.write(s); return s; }
 
 #define TEST(x) std::cout << std::endl << "test> " #x << std::endl; x
+
+#define SHOW_SHR(x) \
+  std::cout << std::endl << "show> " #x << ": "; \
+  if( x.isNull() ) { std::cout << "NULL"; } \
+  else             { std::cout << *(x); } \
+  std::cout << "  refCount=" << x.refCount() << std::endl;
